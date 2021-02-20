@@ -34,6 +34,7 @@ def print_matrix(a):
     if type(a) is list and type(a[0]) is list:
         for r in a:
             print(*r)
+#            print(*[round(c, 2) for c in r])
 
 
 # stage 3
@@ -45,6 +46,7 @@ class MatrixProcessor:
         print("3. Multiply matrices")
         print("4. Transpose matrix")
         print("5. Calculate a determinant")
+        print("6. Inverse matrix")
         print("0. Exit")
         return input("Your choice: ")
 
@@ -120,6 +122,19 @@ class MatrixProcessor:
 
             return det
 
+    def get_cofactor_matrix(self, a):
+        if len(a) == 1:
+            return 1 / a[0][0]
+        else:
+            adjoint = []
+            for i in range(len(a)):
+                adjoint.append([])
+                for j in range(len(a)):
+                    submatrix = [[el for m, el in enumerate(row_a) if m != j] for k, row_a in enumerate(a) if k != i]
+                    adjoint[i].append((-1) ** (i + j) * self.get_matrix_determinant(submatrix))
+
+            return adjoint
+
     def process_matrix_sum(self):
         a = self.get_matrix("first")
         b = self.get_matrix("second")
@@ -182,6 +197,20 @@ class MatrixProcessor:
         determinant = self.get_matrix_determinant(a)
         print(f"The result is:\n{determinant}\n")
 
+    def process_inverse_matrix(self):
+        a = self.get_matrix()
+        determinant = self.get_matrix_determinant(a)
+        if determinant == 0:
+            print("This matrix doesn't have an inverse.\n")
+        else:
+            cof = self.get_cofactor_matrix(a)
+            tmp = self.multiply_by_const(cof, 1 / determinant)
+            res = self.trans_by_main(tmp)
+            print("The result is:")
+            print_matrix(res)
+            print()
+
+
     def run(self):
         while True:
             act = self.show_menu()
@@ -196,6 +225,8 @@ class MatrixProcessor:
                 self.process_transpose(act)
             elif act == "5":
                 self.process_find_determinant()
+            elif act == "6":
+                self.process_inverse_matrix()
             elif act == "0":
                 break
 
